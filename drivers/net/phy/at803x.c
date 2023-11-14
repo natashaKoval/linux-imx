@@ -323,6 +323,29 @@ static void at803x_context_restore(struct phy_device *phydev,
 	phy_write(phydev, AT803X_LED_CONTROL, context->led_control);
 }
 
+static int at803x_rgmii_vol_config_save(struct phy_device *phydev)
+{
+	struct at803x_priv *priv = phydev->priv;
+	const struct regulator_ops *vddio_ops = priv->vddio_rdev->desc->ops;
+
+	if(priv->vddio)
+		priv->vddio_last_selector = vddio_ops->get_voltage_sel(priv->vddio_rdev);
+
+	return 0;
+}
+
+static int at803x_rgmii_vol_config_restore(struct phy_device *phydev)
+{
+	struct at803x_priv *priv = phydev->priv;
+	const struct regulator_ops *vddio_ops = priv->vddio_rdev->desc->ops;
+	int ret = 0;
+
+	if (priv->vddio_last_selector >= 0)
+		ret = vddio_ops->set_voltage_sel(priv->vddio_rdev, priv->vddio_last_selector);
+
+	return ret;
+}
+
 static int at803x_set_wol(struct phy_device *phydev,
 			  struct ethtool_wolinfo *wol)
 {
@@ -431,13 +454,11 @@ static int at803x_suspend(struct phy_device *phydev)
 {
 	int value;
 	int wol_enabled;
-	struct at803x_priv *priv = phydev->priv;
-	const struct regulator_ops *vddio_ops = priv->vddio_rdev->desc->ops;
 
 	value = phy_read(phydev, AT803X_INTR_ENABLE);
 	wol_enabled = value & AT803X_INTR_ENABLE_WOL;
 
-	priv->vddio_last_selector = vddio_ops->get_voltage_sel(priv->vddio_rdev);
+	at803x_rgmii_vol_config_save(phydev);
 
 	if (wol_enabled)
 		value = BMCR_ISOLATE;
@@ -451,11 +472,12 @@ static int at803x_suspend(struct phy_device *phydev)
 
 static int at803x_resume(struct phy_device *phydev)
 {
-	struct at803x_priv *priv = phydev->priv;
-	const struct regulator_ops *vddio_ops = priv->vddio_rdev->desc->ops;
+	int ret;
 
-	if (priv->vddio_last_selector >= 0)
-		vddio_ops->set_voltage_sel(priv->vddio_rdev, priv->vddio_last_selector);
+	ret = at803x_rgmii_vol_config_restore(phydev);
+	if (ret < 0)
+		return ret;
+
 	return phy_modify(phydev, MII_BMCR, BMCR_PDOWN | BMCR_ISOLATE, 0);
 }
 
@@ -778,6 +800,11 @@ static int at8031_pll_config(struct phy_device *phydev)
 					     AT803X_DEBUG_PLL_ON, 0);
 }
 
+static int at803x_rgmii_vol_config(struct phy_device *phydev) {
+
+	return at803x_rgmii_vol_config_restore(phydev);
+}
+
 static int at803x_config_init(struct phy_device *phydev)
 {
 	int ret;
@@ -846,6 +873,10 @@ static int at803x_config_init(struct phy_device *phydev)
 	 * side effect
 	 */
 	at803x_debug_reg_mask(phydev, 0xB, BIT(15), 0);
+
+	ret = at803x_rgmii_vol_config(phydev);
+	if (ret < 0)
+		return ret;
 
 	/* Ar803x extended next page bit is enabled by default. Cisco
 	 * multigig switches read this bit and attempt to negotiate 10Gbps
