@@ -5,7 +5,6 @@
  */
 
 #include "imx8mp-var-dart.dtsi"
-#include "imx8mp-android.dtsi"
 
 / {
 	model = "Variscite DART-MX8M-PLUS on DT8MCustomBoard 2.x";
@@ -127,10 +126,36 @@
 		#clock-cells = <0>;
 		clock-frequency = <40000000>;
 	};
+
+	sound_hdmi: sound_hdmi {
+		compatible = "fsl,imx-audio-hdmi";
+		model = "audio-hdmi";
+		audio-cpu = <&aud2htx>;
+		hdmi-out;
+		constraint-rate = <44100>,
+				<88200>,
+				<176400>,
+				<32000>,
+				<48000>,
+				<96000>,
+				<192000>;
+		status = "okay";
+	};
+
+	sound-xcvr {
+		compatible = "fsl,imx-audio-card";
+		model = "imx-audio-xcvr";
+		pri-dai-link {
+			link-name = "XCVR PCM";
+			cpu {
+				sound-dai = <&xcvr>;
+			};
+		};
+	};
 };
 
 &aud2htx {
-	status = "disabled";
+	status = "okay";
 };
 
 &pwm1 {
@@ -198,6 +223,7 @@
 			};
 		};
 	};
+
 	ov5640_mipi0: ov5640_mipi@3c {
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
@@ -328,6 +354,10 @@
 	};
 };
 
+&isp0_reserved {
+	status = "disabled";
+};
+
 &flexcan1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
@@ -340,7 +370,25 @@
 	status = "okay";
 };
 
+&irqsteer_hdmi {
+	status = "okay";
+};
 
+&hdmi_blk_ctrl {
+	status = "okay";
+};
+
+&hdmi_pavi {
+	status = "okay";
+};
+
+&hdmi {
+	status = "okay";
+};
+
+&hdmiphy {
+	status = "okay";
+};
 
 /* MIPI-DSI */
 &lcdif1 {
@@ -350,6 +398,13 @@
 /* LVDS */
 &lcdif2 {
 	status = "okay";
+};
+
+/* HDMI */
+&lcdif3 {
+	status = "okay";
+	thres-low  = <1 2>;             /* (FIFO * 1 / 2) */
+	thres-high = <3 4>;             /* (FIFO * 3 / 4) */
 };
 
 &ldb {
@@ -419,8 +474,6 @@
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
-	/delete-property/ dmas;
-	/delete-property/ dma-names;
 	status = "okay";
 };
 
@@ -458,7 +511,7 @@
 	srp-disable;
 	adp-disable;
 	usb-role-switch;
-	role-switch-default-mode = "peripheral";
+	role-switch-default-mode = "none";
 	snps,dis-u1-entry-quirk;
 	snps,dis-u2-entry-quirk;
 	status = "okay";
@@ -613,6 +666,11 @@
 	regulator-max-microvolt = <1800000>;
 };
 
+&xcvr {
+	#sound-dai-cells = <0>;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
@@ -640,12 +698,12 @@
 			MX8MP_IOMUXC_SAI1_RXD7__ENET1_RGMII_RD3				0x90
 			MX8MP_IOMUXC_SAI1_TXC__ENET1_RGMII_RXC				0x90
 			MX8MP_IOMUXC_SAI1_TXFS__ENET1_RGMII_RX_CTL			0x90
-			MX8MP_IOMUXC_SAI1_TXD0__ENET1_RGMII_TD0				0x16
-			MX8MP_IOMUXC_SAI1_TXD1__ENET1_RGMII_TD1				0x16
-			MX8MP_IOMUXC_SAI1_TXD2__ENET1_RGMII_TD2				0x16
-			MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3				0x16
-			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL			0x16
-			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC				0x16
+			MX8MP_IOMUXC_SAI1_TXD0__ENET1_RGMII_TD0				0x00
+			MX8MP_IOMUXC_SAI1_TXD1__ENET1_RGMII_TD1				0x00
+			MX8MP_IOMUXC_SAI1_TXD2__ENET1_RGMII_TD2				0x00
+			MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3				0x00
+			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL			0x00
+			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC				0x00
 		>;
 	};
 
@@ -720,15 +778,6 @@
 		fsl,pins = <
 			MX8MP_IOMUXC_UART3_RXD__UART3_DCE_RX				0x40
 			MX8MP_IOMUXC_UART3_TXD__UART3_DCE_TX				0x40
-		>;
-	};
-
-	pinctrl_uart4: uart4grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_ECSPI2_SCLK__UART4_DCE_RX				0x140
-			MX8MP_IOMUXC_ECSPI2_MOSI__UART4_DCE_TX				0x140
-			MX8MP_IOMUXC_ECSPI2_MISO__UART4_DCE_CTS				0x140
-			MX8MP_IOMUXC_ECSPI2_SS0__UART4_DCE_RTS				0x140
 		>;
 	};
 
@@ -845,3 +894,4 @@
 	};
 };
 
+#include "imx8mp-android.dtsi"

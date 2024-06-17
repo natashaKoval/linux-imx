@@ -10,27 +10,6 @@
 #include "imx8mp.dtsi"
 
 / {
-	wifi_rfkill {
-                compatible = "net,rfkill-gpio";
-                pinctrl-names = "default";
-                reset-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
-                name = "wifi_rfkill";
-                type = "wlan";
-                status = "okay";
-        };
-
-        bt_rfkill {
-                compatible = "net,rfkill-gpio";
-                pinctrl-names = "default";
-                pinctrl-0 = <&pinctrl_bt>;
-                reset-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
-                name = "bt_rfkill";
-                type = "bluetooth";
-                status = "okay";
-        };
-
-};
-/ {
 	compatible = "variscite,imx8mp-var-dart", "fsl,imx8mp";
 
 	aliases {
@@ -43,28 +22,15 @@
 		      <0x1 0x00000000 0 0xc0000000>;
 	};
 
-	reserved-memory {
-		/* CMA region is configured by kernel command line as cma=<size>M */
-		/delete-node/ linux,cma;
-	};
-
 	reg_eqos_phy: regulator-eqos-phy {
 		compatible = "regulator-fixed";
 		regulator-name = "eqos-phy";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-enable-ramp-delay = <20000>;
 		gpio = <&gpio2 20 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
-	};
-
-	reg_wifi_3v3: regulator-wifi-3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "wifi-3v3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio2 8 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
 	};
 
 	reg_audio: regulator-audio-vdd {
@@ -125,9 +91,6 @@
 	pinctrl-0 = <&pinctrl_eqos>;
 	phy-mode = "rgmii";
 	phy-handle = <&ethphy0>;
-	snps,reset-gpio = <&gpio2 11 GPIO_ACTIVE_LOW>;
-	snps,reset-delays-us = <100000 10000 100000>;
-	mdio_rst_after_resume;
 	status = "okay";
 
 	mdio {
@@ -139,8 +102,16 @@
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
 			at803x,eee-disabled;
-			at803x,vddio-1p8v;
 			eee-broken-1000t;
+			reset-gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <20000>;
+			vddio-supply = <&vddio0>;
+
+			vddio0: vddio-regulator {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+			};
 		};
 	};
 };
@@ -154,13 +125,13 @@
 	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
-	pmic: pca9450@25 {
+	pca9450@25 {
 		reg = <0x25>;
 		compatible = "nxp,pca9450c";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pmic>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <3 GPIO_ACTIVE_LOW>;
+		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 		status = "okay";
 
 		regulators {
@@ -306,7 +277,7 @@
 /* BT */
 &uart4 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart4>;
+	pinctrl-0 = <&pinctrl_uart4>, <&pinctrl_bt>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART4>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
 	uart-has-rtscts;
@@ -325,7 +296,6 @@
 	non-removable;
 	keep-power-in-suspend;
 	status = "okay";
-	vmmc-supply = <&reg_wifi_3v3>;
 
 	brcmf: bcrmf@1 {
 		reg = <1>;
@@ -384,19 +354,11 @@
 	status = "okay";
 };
 
-&snvs_rtc {
-	status = "disabled";
-};
-
-&caam_snvs {
-	status = "disabled";
-};
-
 &snvs_pwrkey {
 	status = "okay";
 };
 
-&dsp {
+&snvs_rtc {
 	status = "disabled";
 };
 
@@ -418,7 +380,7 @@
 			MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL			0x16
 			MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x16
 			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20					0x10
-			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11				0x10
+			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11				0x150
 		>;
 	};
 
@@ -451,6 +413,15 @@
 			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK			0xd6
 			MX8MP_IOMUXC_SAI3_RXFS__AUDIOMIX_SAI3_RX_SYNC			0xd6
 			MX8MP_IOMUXC_SAI3_RXC__AUDIOMIX_SAI3_RX_BCLK			0xd6
+		>;
+	};
+
+	pinctrl_uart4: uart4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_SCLK__UART4_DCE_RX				0x140
+			MX8MP_IOMUXC_ECSPI2_MOSI__UART4_DCE_TX				0x140
+			MX8MP_IOMUXC_ECSPI2_MISO__UART4_DCE_CTS				0x140
+			MX8MP_IOMUXC_ECSPI2_SS0__UART4_DCE_RTS				0x140
 		>;
 	};
 
@@ -555,4 +526,3 @@
 		>;
 	};
 };
-

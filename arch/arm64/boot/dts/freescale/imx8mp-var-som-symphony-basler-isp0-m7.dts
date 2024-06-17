@@ -4,10 +4,11 @@
  * Copyright 2020-2021 Variscite Ltd.
  */
 
-#include "imx8mp-var-som-symphony.dts"
+#include "imx8mp-var-som-symphony-basler-isp0.dts"
+#include "imx8mp-var-common-m7.dtsi"
 
 / {
-	model = "Variscite VAR-SOM-MX8M-PLUS on Symphony-Board with Basler camera on ISP0";
+	model = "Variscite VAR-SOM-MX8M-PLUS M7 on Symphony-Board with Basler camera on ISP0";
 };
 
 &i2c3 {

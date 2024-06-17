@@ -8,12 +8,12 @@
 #include "imx8mp-var-common-m7.dtsi"
 
 / {
-	model = "Variscite DART-MX8M-PLUS on DT8MCustomBoard 2.x and above, with M7 support";
+	model = "Variscite DART-MX8M-PLUS M7 on DT8MCustomBoard 2.x";
 };
 
 /*
  * ATTENTION: M7 may use IPs like below
- * ECSPI1, I2C3, UART3, PWM3, SDMA1
+ * ECSPI1, I2C3, UART3, PWM3, SDMA1, FLEXCAN1
  */
 
 &uart3 {
@@ -28,6 +28,7 @@
 	status = "disabled";
 };
 
-&sdma1 {
+
+&flexcan1 {
 	status = "disabled";
 };
