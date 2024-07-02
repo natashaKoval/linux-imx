@@ -222,11 +222,19 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
 	u8 status;
 
 	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
-	if (IS_ERR_OR_NULL(skb)) {
-		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
-			   PTR_ERR(skb));
+	if (IS_ERR(skb)) {
+		if (!event)
+			bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
+				   PTR_ERR(skb));
 		return PTR_ERR(skb);
 	}
+
+	/* If command return a status event skb will be set to NULL as there are
+	 * no parameters, in case of failure IS_ERR(skb) would have be set to
+	 * the actual error would be found with PTR_ERR(skb).
+	 */
+	if (!skb)
+		return 0;
 
 	status = skb->data[0];
 
