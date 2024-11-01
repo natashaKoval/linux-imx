@@ -11,7 +11,7 @@
 
 	chosen {
 		stdout-path = &uart1;
-		bootargs-append = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200 androidboot.console=ttymxc0 androidboot.primary_display=imx-drm";
+		bootargs-append = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200 androidboot.console=ttymxc0 androidboot.primary_display=imx-drm moal.mod_para=var_wifi_mod_para.conf";
 	};
 
 	gpio-keys {
@@ -196,6 +196,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi0>;
 	status = "disabled";
+};
+
+&gpio2 {
+	bt_buf_hog: bt_buf_hog {
+		gpio-hog;
+		gpios = <9 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "bt_buf";
+		status = "okay";
+	};
 };
 
 &i2c2 {
