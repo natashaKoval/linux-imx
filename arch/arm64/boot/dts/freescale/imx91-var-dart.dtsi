@@ -13,6 +13,11 @@
 / {
 	compatible = "variscite,imx91-var-som", "fsl,imx91";
 
+	aliases {
+		ethernet0 = &eqos;
+		ethernet1 = &fec;
+	};
+
 	sound-wm8904 {
 		compatible = "simple-audio-card";
 		simple-audio-card,bitclock-master = <&dailink_master>;
