@@ -7360,13 +7360,20 @@ int stmmac_dvr_probe(struct device *device,
 	struct net_device *ndev = NULL;
 	struct stmmac_priv *priv;
 	u32 rxq;
-	int i, ret = 0;
+	int i, ret = 0, id;
 
 	ndev = devm_alloc_etherdev_mqs(device, sizeof(struct stmmac_priv),
 				       MTL_MAX_TX_QUEUES, MTL_MAX_RX_QUEUES);
 	if (!ndev)
 		return -ENOMEM;
 
+#if IS_ENABLED(CONFIG_OF)
+	if (device->of_node) {
+		id = of_alias_get_id(device->of_node, "ethernet");
+		if (id >= 0)
+			snprintf(ndev->name, sizeof(ndev->name), "eth%d", id);
+	}
+#endif
 	SET_NETDEV_DEV(ndev, device);
 
 	priv = netdev_priv(ndev);
