@@ -4339,7 +4339,7 @@ fec_probe(struct platform_device *pdev)
 	int num_tx_qs;
 	int num_rx_qs;
 	char irq_name[8];
-	int irq_cnt;
+	int irq_cnt, id;
 	struct fec_devinfo *dev_info;
 
 	fec_enet_get_queue_num(pdev, &num_tx_qs, &num_rx_qs);
@@ -4349,6 +4349,12 @@ fec_probe(struct platform_device *pdev)
 				  FEC_STATS_SIZE, num_tx_qs, num_rx_qs);
 	if (!ndev)
 		return -ENOMEM;
+
+	if (np) {
+		id = of_alias_get_id(np, "ethernet");
+		if (id >= 0)
+			snprintf(ndev->name, sizeof(ndev->name), "eth%d", id);
+	}
 
 	SET_NETDEV_DEV(ndev, &pdev->dev);
 
