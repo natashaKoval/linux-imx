@@ -8,6 +8,7 @@
 / {
 	lvds_panel: lvds-panel {
 		compatible = "sgd,gktw70sdae4se", "panel-lvds";
+		backlight = <&backlight>;
 		width-mm = <153>;
 		height-mm = <87>;
 		label = "gktw70sdae4se";
@@ -205,6 +206,13 @@
 		reg = <0x22>;
 		gpio-controller;
 		#gpio-cells = <2>;
+	};
+
+	backlight: backlight@2c {
+		compatible = "maxim,ds1050z";
+		reg = <0x2c>;
+		default-brightness = <25>;
+		status = "okay";
 	};
 };
 
