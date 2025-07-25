@@ -166,7 +166,7 @@
 
 &lcdif {
 	status = "okay";
-	assigned-clock-rates = <292320000>, <29232000>, <333333334>, <133333333>;
+	assigned-clock-rates = <204624000>, <29232000>, <333333334>, <133333333>;
 };
 
 /* pin conflicts */
