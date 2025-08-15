@@ -87,6 +87,15 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_hog: hoggrp {
+		fsl,pins = <
+			/* GPIO Expanders shared IRQ */
+			MX93_PAD_PDM_BIT_STREAM1__GPIO1_IO10			0x31e
+                >;
+        };
 	pinctrl_bt: btgrp {
 		fsl,pins = <
 			MX93_PAD_ENET2_MDIO__GPIO4_IO15				0x51e
