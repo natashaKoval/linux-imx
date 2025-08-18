@@ -333,6 +333,7 @@ static int tpm_tis_i2c_probe(struct i2c_client *dev)
 	const u8 crc_enable = 1;
 	const u8 locality = 0;
 	int ret;
+	int irq;
 
 	phy = devm_kzalloc(&dev->dev, sizeof(struct tpm_tis_i2c_phy),
 			   GFP_KERNEL);
@@ -362,7 +363,16 @@ static int tpm_tis_i2c_probe(struct i2c_client *dev)
 	if (ret)
 		return ret;
 
-	return tpm_tis_core_init(&dev->dev, &phy->priv, -1, &tpm_i2c_phy_ops,
+	/* If the I2C device has an IRQ then use that */
+	if (dev->irq > 0) {
+		irq = dev->irq;
+		dev_err(&dev->dev, "Setting IRQ OK.\n");
+	} else {
+		irq = -1;
+		dev_err(&dev->dev, "Setting IRQ failed.\n");
+	}
+
+	return tpm_tis_core_init(&dev->dev, &phy->priv, irq, &tpm_i2c_phy_ops,
 				 NULL);
 }
 
