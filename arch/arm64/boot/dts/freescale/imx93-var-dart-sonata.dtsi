@@ -37,5 +37,7 @@
 	st33ktpm2i: st33ktpm2i@2e {
 		compatible = "infineon,slb9673";
 		reg = <0x2e>;
+		interrupt-parent = <&pca9534>;
+		interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
 	};
 };
