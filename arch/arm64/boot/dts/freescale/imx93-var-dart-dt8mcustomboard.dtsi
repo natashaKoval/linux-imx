@@ -51,7 +51,7 @@
 		power-domains = <&mlmix>;
 	};
 
-	gpio-keys {
+	gpio_keys: gpio-keys {
 		compatible = "gpio-keys";
 		status = "okay";
 

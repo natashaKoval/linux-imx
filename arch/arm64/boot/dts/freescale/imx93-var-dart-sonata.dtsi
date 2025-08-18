@@ -41,3 +41,11 @@
 		interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
 	};
 };
+
+&gpio_keys {
+	test {
+		label = "Test";
+		linux,code = <KEY_UP>;
+		gpios = <&pca9534 1 GPIO_ACTIVE_LOW>;
+	};
+};
