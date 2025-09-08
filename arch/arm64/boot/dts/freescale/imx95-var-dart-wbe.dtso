@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device tree overlay to support the DART-MX95 SoM featuring
+ * WiFi/BT chipset with 802.15.4, used on the Sonata-Board
+ *
+ * Copyright 2025 Variscite Ltd.
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+&{/} {
+	model = "Variscite DART-MX95 with 802.15.4 on Sonata-Board";
+};
+
+/* Disable resistive touch controller on CS0 */
+&ads7846 {
+	status = "disabled";
+};
+
+&lpspi7 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-0 = <&pinctrl_lpspi7>, <&pinctrl_restouch>;
+
+	/* Enable 802.15.4 SPI device on CS0 */
+	spidev@0 {
+		reg = <0>;
+		compatible = "var,spidev";
+		spi-max-frequency = <1000000>;
+		status = "okay";
+	};
+};
+
+&pca9534 {
+	wlanspi-buf-en {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "WLAN_SPI_EN_B";
+	};
+
+	pcie2-sel {
+		output-high;
+		line-name = "PCIE2_SEL";
+	};
+};
+
+&pcie1 {
+	status = "disabled";
+};

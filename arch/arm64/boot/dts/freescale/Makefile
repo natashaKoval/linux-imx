@@ -1002,6 +1002,12 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-tqma9596sa-mb-smarc-2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx95-var-dart-sonata.dtb \
 			   imx95-var-dart-sonata-m7.dtb
 
+imx95-var-dart-wbe-sonata-dtbs := imx95-var-dart-sonata.dtb imx95-var-dart-wbe.dtbo
+imx95-var-dart-wbe-sonata-m7-dtbs := imx95-var-dart-sonata-m7.dtb imx95-var-dart-wbe.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += imx95-var-dart-wbe-sonata.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx95-var-dart-wbe-sonata-m7.dtb
+
 imx95-15x15-evk-pcie-dtbs = imx95-15x15-evk.dtb imx95-15x15-evk-pcie.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-evk-pcie.dtb
 

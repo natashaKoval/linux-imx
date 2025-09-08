@@ -478,6 +478,7 @@
 &lpspi7 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi7>;
+	num-cs = <3>;
 	cs-gpios = <&gpio2 4 GPIO_ACTIVE_LOW>,
 		   <&gpio1 7 GPIO_ACTIVE_LOW>,
 		   <&gpio5 4 GPIO_ACTIVE_LOW>;
