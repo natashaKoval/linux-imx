@@ -487,13 +487,14 @@
 &lpspi7 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi7>;
+	num-cs = <3>;
 	cs-gpios = <&gpio2 4 GPIO_ACTIVE_LOW>,
 		   <&gpio1 7 GPIO_ACTIVE_LOW>,
 		   <&gpio5 4 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
 	/* Resistive touch controller */
-	ads7846@0 {
+	ads7846: ads7846@0 {
 		compatible = "ti,ads7846";
 		reg = <0>;
 		pinctrl-names = "default";
