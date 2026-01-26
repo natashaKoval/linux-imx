@@ -487,6 +487,11 @@
 	wakeup-source;
 	keep-power-in-suspend;
 	status = "okay";
+
+	mwifiex: wifi@1 {
+		reg = <1>;
+		status = "okay";
+	};
 };
 
 &wdog3 {

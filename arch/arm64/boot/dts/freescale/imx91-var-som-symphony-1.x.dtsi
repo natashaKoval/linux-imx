@@ -9,6 +9,7 @@
 		gpio4 = &pca9534;
 		ethernet0 = &eqos;
 		ethernet1 = &fec;
+		wifi0 = &mwifiex;
 	};
 
 	chosen {
