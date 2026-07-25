@@ -3845,6 +3845,7 @@ static s32 brcmf_cfg80211_resume(struct wiphy *wiphy)
 			cfg->wowl.nd_enabled = false;
 		}
 	}
+	brcmf_dbg(TRACE, "Enter\n");
 	return 0;
 }
 

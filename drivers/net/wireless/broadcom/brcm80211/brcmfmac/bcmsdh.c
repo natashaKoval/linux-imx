@@ -953,8 +953,10 @@ int brcmf_sdiod_probe(struct brcmf_sdio_dev *sdiodev)
 	}
 	brcmf_sdiod_host_fixup(sdiodev->func2->card->host);
 out:
-	if (ret)
+	if (ret) {
 		brcmf_sdiod_remove(sdiodev);
+		brcmf_err("sdiod probe failed!\n");
+	}
 
 	return ret;
 }
@@ -1082,6 +1084,7 @@ static int brcmf_ops_sdio_probe(struct sdio_func *func,
 	}
 
 	brcmf_dbg(SDIO, "F2 init completed...\n");
+	brcmf_dbg(TRACE, "brcmf_ops_sdio_probe OK...\n");
 	return 0;
 
 fail:
@@ -1089,6 +1092,7 @@ fail:
 	dev_set_drvdata(&sdiodev->func1->dev, NULL);
 	kfree(sdiodev);
 	kfree(bus_if);
+	brcmf_dbg(TRACE, "brcmf_ops_sdio_probe FAILED...\n");
 	return err;
 }
 
@@ -1097,6 +1101,7 @@ static void brcmf_ops_sdio_remove(struct sdio_func *func)
 	struct brcmf_bus *bus_if;
 	struct brcmf_sdio_dev *sdiodev;
 
+	brcmf_dbg(TRACE, "brcmf_ops_sdio_remove Enter...\n");
 	brcmf_dbg(SDIO, "Enter\n");
 	brcmf_dbg(SDIO, "sdio vendor ID: 0x%04x\n", func->vendor);
 	brcmf_dbg(SDIO, "sdio device ID: 0x%04x\n", func->device);
@@ -1123,6 +1128,7 @@ static void brcmf_ops_sdio_remove(struct sdio_func *func)
 	}
 
 	brcmf_dbg(SDIO, "Exit\n");
+	brcmf_dbg(TRACE, "brcmf_ops_sdio_remove Exit...\n");
 }
 
 void brcmf_sdio_wowl_config(struct device *dev, bool enabled)
@@ -1146,6 +1152,7 @@ void brcmf_sdio_wowl_config(struct device *dev, bool enabled)
 
 notsup:
 	brcmf_dbg(SDIO, "WOWL not supported\n");
+	brcmf_dbg(TRACE, "WOWL not supported...\n");
 }
 
 static int brcmf_ops_sdio_suspend(struct device *dev)
@@ -1158,6 +1165,7 @@ static int brcmf_ops_sdio_suspend(struct device *dev)
 
 	func = container_of(dev, struct sdio_func, dev);
 	brcmf_dbg(SDIO, "Enter: F%d\n", func->num);
+	brcmf_dbg(TRACE, "Enter SDIO suspend: F%d\n", func->num);
 	if (func->num != 1)
 		return 0;
 
@@ -1185,7 +1193,7 @@ static int brcmf_ops_sdio_suspend(struct device *dev)
 		if (ret)
 			brcmf_err("Failed to remove device on suspend\n");
 	}
-
+	brcmf_dbg(TRACE, "Exit SDIO suspend: F%d\n", func->num);
 	return ret;
 }
 
@@ -1197,6 +1205,7 @@ static int brcmf_ops_sdio_resume(struct device *dev)
 	int ret = 0;
 
 	brcmf_dbg(SDIO, "Enter: F%d\n", func->num);
+	brcmf_dbg(TRACE, "Enter SDIO resume: F%d\n", func->num);
 	if (func->num != 2)
 		return 0;
 
@@ -1220,7 +1229,7 @@ static int brcmf_ops_sdio_resume(struct device *dev)
 
 		brcmf_sdiod_freezer_off(sdiodev);
 	}
-
+	brcmf_dbg(TRACE, "Exit SDIO resume: F%d\n", func->num);
 	return ret;
 }
 
