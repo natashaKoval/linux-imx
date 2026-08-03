@@ -78,7 +78,7 @@
 #define MAX_FW_FILE_NAME_LEN    50
 
 /* Default ps timeout period in milliseconds */
-#define PS_DEFAULT_TIMEOUT_PERIOD_MS     2000
+#define PS_DEFAULT_TIMEOUT_PERIOD_MS     200000
 
 /* wakeup methods */
 #define WAKEUP_METHOD_DTR       0
@@ -360,7 +360,7 @@ static u8 crc8_table[CRC8_TABLE_SIZE];
 
 /* Default configurations */
 #define DEFAULT_H2C_WAKEUP_MODE	WAKEUP_METHOD_BREAK
-#define DEFAULT_PS_MODE		PS_MODE_ENABLE
+#define DEFAULT_PS_MODE		PS_MODE_DISABLE
 #define FW_INIT_BAUDRATE	HCI_NXP_PRI_BAUDRATE
 
 static struct sk_buff *nxp_drv_send_cmd(struct hci_dev *hdev, u16 opcode,
